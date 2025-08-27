@@ -2,31 +2,50 @@
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_render.h"
+#include "geometry.h"
+#include <iostream>
+#include <ostream>
 
 #define SDL_MAIN_USE_CALLBACKS 1
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <chrono>
 #include "renderer.h"
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
-static TestRenderer t_renderer;
+static Renderer t_renderer;
 
 static int screen_width = 800;
 static int screen_height = 600;
 
-static int colorIdx = 0;
-static int colors[6][3] {
-    {255, 0, 0}, {0, 255, 0}, {0, 0, 255},
-    {255, 0, 255}, {255, 255, 0}, {0, 255, 255}
-};
+static std::chrono::steady_clock::time_point lastTime;
+
+static renderableObject* cube1;
+static renderableObject* cube2;
+static renderableObject* cube3;
+static renderableObject* cube4;
+
+static int MAX_FPS = 180;
+
+void setFPS(int fps) {
+    MAX_FPS = fps;
+}
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     
     SDL_SetAppMetadata("Idk Man", "0.0", "net.olikujy.idkman");
 
-    t_renderer = TestRenderer(screen_width, screen_height);
+    t_renderer = Renderer(screen_width, screen_height);
+    t_renderer.activeObjects.reserve(4);
+
+    cube1 = &createCube(t_renderer, {-2.0f, 0.0f, 3.0f}, 1.0f, 2.0f, 1.0f);
+    cube2 = &createCube(t_renderer, {0.0f, 1.0f, 3.0f}, 1.0f, 1.0f, 1.0f);
+    cube3 = &createCube(t_renderer, {0.0f, -1.0f, 3.0f}, 1.0f, 1.0f, 1.0f);
+    cube4 = &createCube(t_renderer, {2.0f, 0.0f, 3.0f}, 1.0f, 1.0f, 1.0f);
+
+    lastTime = std::chrono::steady_clock::now();
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
@@ -50,51 +69,37 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 } 
 
 SDL_AppResult SDL_AppIterate(void *appstate) {
-    
+
+    using namespace std::chrono;
+
+    auto now = steady_clock::now();
+    auto maxFrameDuration = milliseconds(1000 / MAX_FPS);
+    while(now - lastTime < maxFrameDuration) {
+        now = steady_clock::now();
+    }
+
+    // Gets the frame time, and stores it inside of a double variable. ⛷️
+    duration<double> delta = now - lastTime;
+    double deltaTime = delta.count();
+
+    t_renderer.getCameraReference().rot = translate(t_renderer.getCameraReference().rot, {0.0f, 1.0f, 0.0f}, deltaTime);
+
+    // std::cout << t_renderer.getCameraReference().pos << std::endl;
+
     SDL_SetRenderDrawColorFloat(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 
-    vec3d movementLeft = {0.0f, 0.0f, 0.0f};
+    rotateObject(*cube3, {0.0f, 1.0f, 0.0f}, deltaTime);
 
-    for(triangle& tri : t_renderer.getCube().tris) {
+    rotateObject(*cube1, {1.0f, 1.0f, 1.0f}, deltaTime);
 
-        tri.p[0] = transByVec(tri.p[0], movementLeft);
-        tri.p[1] = transByVec(tri.p[1], movementLeft);
-        tri.p[2] = transByVec(tri.p[2], movementLeft);
-
-        int tempIdx = colorIdx/2;
-        SDL_SetRenderDrawColor(renderer, 
-                colors[tempIdx][0], colors[tempIdx][1], 
-                colors[tempIdx][2], SDL_ALPHA_OPAQUE);
-
-        colorIdx = (colorIdx + 1) % 12;
-
-        triangle projected_tri;
-
-        projected_tri.p[0] = multMatVec(tri.p[0], t_renderer.proj_mat); 
-        projected_tri.p[1] = multMatVec(tri.p[1], t_renderer.proj_mat); 
-        projected_tri.p[2] = multMatVec(tri.p[2], t_renderer.proj_mat); 
-
-        for(vec3d& v : projected_tri.p) {
-            
-            v.x += 1.0f;
-            v.y += 1.0f;
-
-            v.x *= 0.5f * (float)screen_width;
-            v.y *= 0.5f * (float)screen_height;
-        }
-
-        SDL_RenderLine(renderer, projected_tri.p[0].x, projected_tri.p[0].y, projected_tri.p[1].x, projected_tri.p[1].y);
-        SDL_RenderLine(renderer, projected_tri.p[1].x, projected_tri.p[1].y, projected_tri.p[2].x, projected_tri.p[2].y);
-        SDL_RenderLine(renderer, projected_tri.p[2].x, projected_tri.p[2].y, projected_tri.p[0].x, projected_tri.p[0].y);
-    }
-    
-    SDL_RenderLine(renderer, 0, 0, 16, 16);
+    t_renderer.renderObjects(*renderer);
 
     SDL_RenderPresent(renderer);
 
+    lastTime = now;
 
     return SDL_APP_CONTINUE;
 }
