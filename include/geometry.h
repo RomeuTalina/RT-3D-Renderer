@@ -17,6 +17,26 @@ struct vec3d {
     float x, y, z;   
 };
 
+inline vec3d normalize(vec3d input) {
+
+    vec3d output;
+    float length = std::sqrt(input.x*input.x + input.y*input.y + input.z*input.z);
+    output.x = input.x/length;
+    output.y = input.y/length;
+    output.z = input.z/length;
+
+    return output;
+}
+
+inline vec3d operator+(vec3d vec1, vec3d vec2) {
+
+    vec1.x = vec1.x + vec2.x; 
+    vec1.y = vec1.y + vec2.y; 
+    vec1.z = vec1.z + vec2.z; 
+
+    return vec1;
+}
+
 inline vec3d operator-(vec3d vec1, vec3d vec2) {
 
     vec1.x = vec1.x - vec2.x; 
@@ -33,6 +53,15 @@ inline vec3d operator*(vec3d vec, double mult) {
     vec.z *= mult;
 
     return vec;
+}
+
+inline vec3d operator*(vec3d vec1, vec3d vec2) {
+
+    vec1.x *= vec2.x;
+    vec1.y *= vec2.y;
+    vec1.z *= vec2.z;
+
+    return vec1;
 }
 
 inline std::ostream& operator<<(std::ostream& out, const vec3d in) {

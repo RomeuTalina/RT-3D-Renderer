@@ -21,6 +21,7 @@ static int screen_width = 800;
 static int screen_height = 600;
 
 static std::chrono::steady_clock::time_point lastTime;
+static double deltaTime = 0;
 
 static renderableObject* cube1;
 static renderableObject* cube2;
@@ -65,6 +66,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         return SDL_APP_SUCCESS;
     }
 
+    t_renderer.getCamera().takeInput(event, deltaTime);
+
     return SDL_APP_CONTINUE;
 } 
 
@@ -82,7 +85,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     duration<double> delta = now - lastTime;
     double deltaTime = delta.count();
 
-    t_renderer.getCameraReference().rot = translate(t_renderer.getCameraReference().rot, {0.0f, 1.0f, 0.0f}, deltaTime);
+    // t_renderer.getCameraReference().rot = translate(t_renderer.getCameraReference().rot, {0.0f, 1.0f, 0.0f}, deltaTime);
+    // t_renderer.getCameraReference().pos = translate(t_renderer.getCameraReference().pos, {0.0f, 0.0f, -1.0f}, deltaTime);
 
     // std::cout << t_renderer.getCameraReference().pos << std::endl;
 
