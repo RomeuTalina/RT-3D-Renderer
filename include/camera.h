@@ -39,7 +39,7 @@ public:
             if(event->key.key == SDLK_W) {
                 vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)); 
                 std::cout << forwards;
-                this->pos = pos + (forwards * deltaTime);
+                setPos(this->pos + (forwards * deltaTime));
                 std::cout << pos << std::endl;
             }
         }
