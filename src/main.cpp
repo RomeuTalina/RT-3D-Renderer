@@ -83,7 +83,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     // Gets the frame time, and stores it inside of a double variable. ⛷️
     duration<double> delta = now - lastTime;
-    double deltaTime = delta.count();
+    deltaTime = delta.count();
 
     // t_renderer.getCameraReference().rot = translate(t_renderer.getCameraReference().rot, {0.0f, 1.0f, 0.0f}, deltaTime);
     // t_renderer.getCameraReference().pos = translate(t_renderer.getCameraReference().pos, {0.0f, 0.0f, -1.0f}, deltaTime);

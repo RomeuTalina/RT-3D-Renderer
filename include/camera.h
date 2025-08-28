@@ -37,9 +37,9 @@ public:
         switch(event->type) {
         case SDL_EVENT_KEY_DOWN:
             if(event->key.key == SDLK_W) {
-                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos, deltaTime));
+                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)); 
                 std::cout << forwards;
-                pos = pos + (forwards * deltaTime);
+                this->pos = pos + (forwards * deltaTime);
                 std::cout << pos << std::endl;
             }
         }

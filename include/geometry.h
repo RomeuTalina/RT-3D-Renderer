@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <iostream>
 #include <ostream>
 
 struct mat3x3 {
@@ -165,6 +166,31 @@ inline mat4x4 createRotationMatrix(vec3d angles) {
     mat4x4 generalRotMat = multMatMat4x4(multMatMat4x4(rotationX, rotationY), rotationZ);
 
     return generalRotMat;
+}
+
+inline vec3d rotate(vec3d input, vec3d angles, vec3d pivot) {
+
+    mat4x4 generalRotMat = createRotationMatrix(angles);
+
+    mat4x4 transToOrigin {
+        1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            -pivot.x, -pivot.y, -pivot.z, 1
+    };
+
+    mat4x4 transToPivot {
+        1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            pivot.x, pivot.y, pivot.z, 1
+    };
+
+    mat4x4 fullMat = multMatMat4x4(multMatMat4x4(transToOrigin, generalRotMat), transToPivot);
+
+    vec3d outputVec = multMatVec4x4(input, fullMat);
+    
+    return outputVec;
 }
 
 inline vec3d rotate(vec3d input, vec3d angles, vec3d pivot, double deltaTime) {
