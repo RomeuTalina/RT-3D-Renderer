@@ -66,7 +66,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         return SDL_APP_SUCCESS;
     }
 
-    t_renderer.getCamera().takeInput(event, deltaTime);
 
     return SDL_APP_CONTINUE;
 } 
@@ -90,6 +89,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 
     // std::cout << t_renderer.getCameraReference().pos << std::endl;
 
+    t_renderer.getCameraReference().takeInput(deltaTime);
     SDL_SetRenderDrawColorFloat(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderClear(renderer);
 

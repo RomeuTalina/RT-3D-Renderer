@@ -26,7 +26,7 @@ class Renderer {
 private:
     int m_screen_width {};
     int m_screen_height {};
-    Camera m_cam;
+    Camera m_cam {};
 
 public:
     std::vector<renderableObject> activeObjects;
@@ -34,16 +34,16 @@ public:
 
     Renderer (){};
 
-    Renderer(int screen_width, int screen_height):
-        m_screen_width {screen_width},
-        m_screen_height {screen_height}
-    {
-        m_cam.z_near = 0.1f;  
-        m_cam.z_far = 1000.0f; 
-        m_cam.fov = 90.0f;
-        m_cam.aspect_ratio = (float)m_screen_height / (float)m_screen_width; 
-        m_cam.f_scaling = 1.0f / (tanf(m_cam.fov*0.5f / 180.0f * 3.14159f));
-        m_cam.q_scaling = m_cam.z_far / (m_cam.z_far - m_cam.z_near);
+Renderer(int screen_width, int screen_height):
+    m_screen_width {screen_width},
+    m_screen_height {screen_height}
+{
+    m_cam.z_near = 0.1f;  
+    m_cam.z_far = 1000.0f; 
+    m_cam.fov = 90.0f;
+    m_cam.aspect_ratio = (float)m_screen_height / (float)m_screen_width; 
+    m_cam.f_scaling = 1.0f / (tanf(m_cam.fov*0.5f / 180.0f * 3.14159f));
+    m_cam.q_scaling = m_cam.z_far / (m_cam.z_far - m_cam.z_near);
 
         proj_mat.m[0][0] = m_cam.aspect_ratio * m_cam.f_scaling;
         proj_mat.m[1][1] = m_cam.f_scaling;

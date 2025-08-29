@@ -2,6 +2,8 @@
 #define CAMERA_H
 
 #include "SDL3/SDL_events.h"
+#include "SDL3/SDL_keyboard.h"
+#include "SDL3/SDL_stdinc.h"
 #include "geometry.h"
 #include <iostream>
 
@@ -33,19 +35,18 @@ public:
         return multMatMat4x4(rotationViewMatrix, translationViewMatrix);
     }
 
-    void takeInput(SDL_Event *event, double deltaTime) {
-        switch(event->type) {
-        case SDL_EVENT_KEY_DOWN:
-            if(event->key.key == SDLK_W) {
-                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)); 
-                std::cout << forwards;
+    void takeInput(double deltaTime) {
+        const bool *state = SDL_GetKeyboardState(NULL);
+            if(state[SDL_SCANCODE_W]) {
+                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)) * 10; 
                 setPos(this->pos + (forwards * deltaTime));
-                std::cout << pos << std::endl;
+            }
+            if(state[SDL_SCANCODE_S]) {
+                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)) * 10; 
+                setPos(this->pos - (forwards * deltaTime));
             }
         }
-    }
-
-};
+    };
 
 #endif
 
