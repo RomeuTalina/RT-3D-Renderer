@@ -45,6 +45,14 @@ public:
                 vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)) * 10; 
                 setPos(this->pos - (forwards * deltaTime));
             }
+            if(state[SDL_SCANCODE_D]) {
+                vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos)) * 10; 
+                setPos(this->pos + (right * deltaTime));
+            }
+            if(state[SDL_SCANCODE_A]) {
+                vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos)) * 10; 
+                setPos(this->pos - (right * deltaTime));
+            }
         }
     };
 
