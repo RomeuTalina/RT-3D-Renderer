@@ -4,9 +4,7 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_scancode.h"
-#include "SDL3/SDL_stdinc.h"
 #include "geometry.h"
-#include <iostream>
 
 class Camera {
 
@@ -41,7 +39,7 @@ public:
         vel = {0.0f, 0.0f, 0.0f};
     }
 
-    void takeInput(double deltaTime) {
+    void takeKeyboardInput(double deltaTime) {
         const bool *state = SDL_GetKeyboardState(NULL);
         if(state[SDL_SCANCODE_W]) {
             vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos));
@@ -72,7 +70,18 @@ public:
 
         updatePosition();
     }
+
+    void takeMouseInput(SDL_Event *event) {
+        int dx = event->motion.yrel;    
+        int dy = event->motion.xrel;    
+
+        rot.x -= dx * 0.002f;
+        rot.y += dy * 0.002f;
+
+        rot = normalize(rot);
+
+        std::cout << rot << std::endl;
+    }
 };
 
 #endif
-

@@ -1,5 +1,7 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
+#include "SDL3/SDL_mouse.h"
+#include "SDL3/SDL_oldnames.h"
 #include "SDL3/SDL_pixels.h"
 #include "SDL3/SDL_render.h"
 #include "geometry.h"
@@ -58,6 +60,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
         return SDL_APP_FAILURE;
     }
 
+    SDL_SetWindowRelativeMouseMode(window, true);
+
     return SDL_APP_CONTINUE;
 }
 
@@ -66,6 +70,12 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         return SDL_APP_SUCCESS;
     }
 
+    // Mouse events are separated from keyboard events because of how sdl works.
+    switch(event->type){
+    case SDL_EVENT_MOUSE_MOTION:
+        t_renderer.getCameraReference().takeMouseInput(event);
+        break;
+    }
 
     return SDL_APP_CONTINUE;
 } 
@@ -84,12 +94,9 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     duration<double> delta = now - lastTime;
     deltaTime = delta.count();
 
-    // t_renderer.getCameraReference().rot = translate(t_renderer.getCameraReference().rot, {0.0f, 1.0f, 0.0f}, deltaTime);
-    // t_renderer.getCameraReference().pos = translate(t_renderer.getCameraReference().pos, {0.0f, 0.0f, -1.0f}, deltaTime);
+    // Keyboard Inputs have to be in the iterate function so movement is smooth.
+    t_renderer.getCameraReference().takeKeyboardInput(deltaTime);
 
-    // std::cout << t_renderer.getCameraReference().pos << std::endl;
-
-    t_renderer.getCameraReference().takeInput(deltaTime);
     SDL_SetRenderDrawColorFloat(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE_FLOAT);
     SDL_RenderClear(renderer);
 
