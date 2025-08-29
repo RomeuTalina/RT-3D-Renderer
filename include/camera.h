@@ -3,6 +3,7 @@
 
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_keyboard.h"
+#include "SDL3/SDL_scancode.h"
 #include "SDL3/SDL_stdinc.h"
 #include "geometry.h"
 #include <iostream>
@@ -35,26 +36,43 @@ public:
         return multMatMat4x4(rotationViewMatrix, translationViewMatrix);
     }
 
+    void updatePosition() {
+        pos = pos + vel * 0.1;
+        vel = {0.0f, 0.0f, 0.0f};
+    }
+
     void takeInput(double deltaTime) {
         const bool *state = SDL_GetKeyboardState(NULL);
-            if(state[SDL_SCANCODE_W]) {
-                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)) * 10; 
-                setPos(this->pos + (forwards * deltaTime));
-            }
-            if(state[SDL_SCANCODE_S]) {
-                vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos)) * 10; 
-                setPos(this->pos - (forwards * deltaTime));
-            }
-            if(state[SDL_SCANCODE_D]) {
-                vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos)) * 10; 
-                setPos(this->pos + (right * deltaTime));
-            }
-            if(state[SDL_SCANCODE_A]) {
-                vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos)) * 10; 
-                setPos(this->pos - (right * deltaTime));
-            }
+        if(state[SDL_SCANCODE_W]) {
+            vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos));
+            vel = vel + (forwards * deltaTime);
         }
-    };
+        if(state[SDL_SCANCODE_S]) {
+            vec3d forwards = normalize(rotate({0.0f, 0.0f, 1.0f}, rot, pos));
+            vel = vel - (forwards * deltaTime);
+        }
+        if(state[SDL_SCANCODE_D]) {
+            vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos));
+            vel = vel + (right * deltaTime);
+        }
+        if(state[SDL_SCANCODE_A]) {
+            vec3d right = normalize(rotate({1.0f, 0.0f, 0.0f}, rot, pos));
+            vel = vel - (right * deltaTime);
+        }
+        if(state[SDL_SCANCODE_LCTRL]) {
+            vec3d up = normalize(rotate({0.0f, 1.0f, 0.0f}, rot, pos));
+            vel = vel + (up * deltaTime);
+        }
+        if(state[SDL_SCANCODE_SPACE]) {
+            vec3d up = normalize(rotate({0.0f, 1.0f, 0.0f}, rot, pos));
+            vel = vel - (up * deltaTime);
+        }
+
+        vel = normalize(vel);
+
+        updatePosition();
+    }
+};
 
 #endif
 

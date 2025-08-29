@@ -20,11 +20,14 @@ struct vec3d {
 
 inline vec3d normalize(vec3d input) {
 
-    vec3d output;
+    vec3d output {0.0f, 0.0f, 0.0f};
     float length = std::sqrt(input.x*input.x + input.y*input.y + input.z*input.z);
-    output.x = input.x/length;
-    output.y = input.y/length;
-    output.z = input.z/length;
+
+    if(length > 1e-6f){
+        output.x = input.x/length;
+        output.y = input.y/length;
+        output.z = input.z/length;
+    }
 
     return output;
 }
